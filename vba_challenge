@@ -1,0 +1,121 @@
+Sub MultipleYearStockData()
+
+    For Each Ws In Worksheets
+        
+        Ws.Range("I1").Value = "Ticker Symbol"
+        Ws.Range("L1").Value = "Total Stock Volume"
+        Ws.Range("J1").Value = "Yearly Stock Change"
+        Ws.Range("K1").Value = "Percent Change"
+        Ws.Range("P1").Value = "Ticker Symbol"
+        Ws.Range("Q1").Value = "Value"
+        Ws.Range("O2").Value = "Greatest Percent Increase"
+        Ws.Range("O3").Value = "Greatest Percent Decrease"
+        Ws.Range("O4").Value = "Greatest Total Volume"
+        
+        Dim Ticker As String
+        Dim LastRow As Long
+        Dim TotalVolume As Double
+        Dim Count As Long
+        Dim PreValue As Long
+        Dim YearChange As Double
+        Dim YearOpen As Double
+        Dim YearClose As Double
+        Dim PercentChange As Double
+        Dim IncreasedValue As Double
+        Dim DecreasedValue As Double
+        Dim LastRowValue As Long
+        Dim GreatestValue As Double
+             
+        TotalVolume = 0
+        Count = 2
+        IncreasedValue = 0
+        DecreasedValue = 0
+        GreatestValue = 0
+        PreValue = 2
+        
+        LastRow = Ws.Cells(Rows.Count, 1).End(xlUp).Row
+        
+        For i = 2 To LastRow
+            
+            TotalVolume = TotalVolume + Ws.Cells(i, 7).Value
+            
+            If Ws.Cells(i + 1, 1).Value <> Ws.Cells(i, 1).Value Then
+            Ticker = Ws.Cells(i, 1).Value
+                    
+            'Ticker Symbol
+            Ws.Range("I" & Count).Value = Ticker
+            
+            'Total Stock Volume
+            Ws.Range("L" & Count).Value = TotalVolume
+            TotalVolume = 0
+            
+            'Yearly Stock Change
+            YearOpen = Ws.Range("C" & PreValue)
+            YearClose = Ws.Range("F" & i)
+            YearChange = YearClose - YearOpen
+            Ws.Range("J" & Count).Value = YearChange
+            
+            'Year Percent Change
+            If YearOpen = 0 Then
+                PercentChange = 0
+                
+            Else
+            
+                YearOpen = Ws.Range("C" & PreValue)
+                PercentChange = YearChange / YearOpen
+                
+            End If
+            
+            Ws.Range("K" & Count).NumberFormat = "0.00%"
+            Ws.Range("K" & Count).Value = PercentChange
+            
+            'Conditional Formatting Positive or Negative
+                If Ws.Range("J" & Count).Value >= 0 Then
+                    Ws.Range("J" & Count).Interior.ColorIndex = 50
+                    
+                Else
+                
+                    Ws.Range("J" & Count).Interior.ColorIndex = 53
+                    
+                End If
+            
+            Count = Count + 1
+            PreValue = i + 1
+            
+            End If
+            
+        Next i
+        
+        'Find Greatest Value
+        LastRowofValue = Ws.Cells(Rows.Count, 11).End(xlUp).Row
+        Ws.Range("Q2").NumberFormat = "0.00%"
+        Ws.Range("Q3").NumberFormat = "0.00%"
+        
+        For j = 2 To LastRowValue
+        
+            If Ws.Range("K" & j).Value > IncreasedValue Then
+                IncreaseVal = Ws.Range("K" & j).Value
+                Ws.Range("Q2").Value = IncreasedValue
+                Ws.Range("P2").Value = Ws.Range("I" & j).Value
+                
+            End If
+            
+            If Ws.Range("K" & j).Value < DecreasedValue Then
+                DecreasedValue = Ws.Range("K" & j).Value
+                Ws.Range("Q3").Value = DecreasedValue
+                Ws.Range("P3").Value = Ws.Range("I" & j).Value
+                
+            End If
+            
+            If Ws.Range("L" & j).Value > GreatestValue Then
+                GreatestValue = Ws.Range("L" & j).Value
+                Ws.Range("Q4").Value = GreatestValue
+                Ws.Range("P4").Value = Ws.Range("I" & j).Value
+                
+            End If
+            
+        Next j
+
+    Next Ws
+    
+End Sub
